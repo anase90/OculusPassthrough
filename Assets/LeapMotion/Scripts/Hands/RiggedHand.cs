@@ -14,18 +14,25 @@ public class RiggedHand : HandModel {
   public Transform palm;
   public Transform foreArm;
 
+  public Vector3 modelFingerPointing = Vector3.forward;
+  public Vector3 modelPalmFacing = -Vector3.up;
+
   public override void InitHand() {
     UpdateHand();
+  }
+
+  public Quaternion Reorientation() {
+    return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
   }
 
   public override void UpdateHand() {
     if (palm != null) {
       palm.position = GetPalmPosition();
-      palm.rotation = GetPalmRotation();
+      palm.rotation = GetPalmRotation() * Reorientation();
     }
 
     if (foreArm != null)
-      foreArm.rotation = GetArmRotation();
+      foreArm.rotation = GetArmRotation() * Reorientation();
 
     for (int i = 0; i < fingers.Length; ++i) {
       if (fingers[i] != null)
